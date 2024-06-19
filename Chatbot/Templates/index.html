@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Listings</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .job-listing {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 15px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .job-details {
+            flex-grow: 1;
+        }
+        .view-button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .view-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Job Listings</h1>
+    <div id="job-listings"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('/api/job')
+                .then(response => response.json())
+                .then(data => {
+                    const jobListings = document.getElementById('job-listings');
+                    if (data.length > 0) {
+                        data.forEach(job => {
+                            const jobDiv = document.createElement('div');
+                            jobDiv.className = 'job-listing';
+                            jobDiv.innerHTML = `
+                                <div class="job-details">
+                                    <div class="job-title"><strong>Title:</strong> ${job.job_title}</div>
+                                    <div><strong>Status:</strong> ${job.status}</div>
+                                    <div><strong>Client:</strong> ${job.client}</div>
+                                </div>
+                                <button class="view-button" onclick="viewJob('${job._id.$oid}')">View</button>
+                            `;
+                            jobListings.appendChild(jobDiv);
+                        });
+                    } else {
+                        jobListings.innerHTML = '<p>No job data available</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching job data:', error);
+                    document.getElementById('job-listings').innerHTML = '<p>Failed to load job data</p>';
+                });
+        });
+
+        function viewJob(id) {
+            window.location.href = `/job-details.html?id=${id}`;
+        }
+    </script>
+</body>
+</html>
